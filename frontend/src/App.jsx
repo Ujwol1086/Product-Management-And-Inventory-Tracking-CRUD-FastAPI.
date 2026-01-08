@@ -51,25 +51,18 @@ function App() {
       setProducts(res.data);
       setError("");
     } catch (err) {
-      setError("Failed to fetch products");
+      if (err.code === "ECONNREFUSED" || err.message.includes("Network Error")) {
+        setError("Cannot connect to backend. Make sure the server is running on http://localhost:8000");
+      } else {
+        setError(err.response?.data?.detail || "Failed to fetch products");
+      }
     }
     setLoading(false);
   };
 
   useEffect(() => {
     // Initial fetch
-    const run = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get("/products");
-        setProducts(res.data);
-        setError("");
-      } catch (err) {
-        setError("Failed to fetch products");
-      }
-      setLoading(false);
-    };
-    run();
+    fetchProducts();
   }, []);
 
   // Handle sorting
@@ -155,7 +148,11 @@ function App() {
       resetForm();
       fetchProducts();
     } catch (err) {
-      setError(err.response?.data?.detail || err.response?.data || "Operation failed");
+      if (err.code === "ECONNREFUSED" || err.message.includes("Network Error")) {
+        setError("Cannot connect to backend. Make sure the server is running on http://localhost:8000");
+      } else {
+        setError(err.response?.data?.detail || err.response?.data || "Operation failed");
+      }
     }
     setLoading(false);
   };
@@ -186,7 +183,11 @@ function App() {
       setMessage("Product deleted successfully");
       fetchProducts();
     } catch (err) {
-      setError("Delete failed");
+      if (err.code === "ECONNREFUSED" || err.message.includes("Network Error")) {
+        setError("Cannot connect to backend. Make sure the server is running on http://localhost:8000");
+      } else {
+        setError(err.response?.data?.detail || "Delete failed");
+      }
     }
     setLoading(false);
   };
@@ -199,7 +200,7 @@ function App() {
       <header className="topbar">
         <div className="brand">
           <span className="brand-badge">📦</span>
-          <h1>Product Management System</h1>
+          <h1>Product Management System CRUD</h1>
         </div>
         <div className="top-actions">
           <button className="btn btn-light" onClick={fetchProducts} disabled={loading}>
